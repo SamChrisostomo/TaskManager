@@ -19,18 +19,18 @@ fun AppNavigation() {
         composable(route = ApplicationRoutes.HOME_ROUTE) {
             HomeScreenRoute(navController = navController)
         }
-        composable(route = ApplicationRoutes.ADD_ROUTE) {
-
-        }
-        composable(
-            route = ApplicationRoutes.EDIT_ROUTE_TEMPLATE,
-            arguments = listOf(
-                navArgument(
-                    ApplicationRoutes.TASK_ID_ARG
-                ) { type = NavType.IntType })
-        ) { backStackEntry ->
-            val taskId = backStackEntry.arguments?.getInt(ApplicationRoutes.TASK_ID_ARG)
-
-        }
+//        composable(route = ApplicationRoutes.ADD_ROUTE) {
+//
+//        }
+//        composable(
+//            route = ApplicationRoutes.EDIT_ROUTE_TEMPLATE,
+//            arguments = listOf(
+//                navArgument(
+//                    ApplicationRoutes.TASK_ID_ARG
+//                ) { type = NavType.IntType })
+//        ) { backStackEntry ->
+//            val taskId = backStackEntry.arguments?.getInt(ApplicationRoutes.TASK_ID_ARG)
+//
+//        }
     }
 }

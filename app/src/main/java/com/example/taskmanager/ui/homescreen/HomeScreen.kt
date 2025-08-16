@@ -52,12 +52,28 @@ fun HomeScreen(
                     .weight(1f),
                 state = taskListState,
             ) {
-                items(completedTasks.size) {
-                    HorizontalDivider()
-                    AppLazyListItem(
-                        title = "Task $it",
-                        subtitle = "Description of task $it"
-                    )
+                if (completedTasks.isEmpty()) {
+                    item {
+                        HorizontalDivider()
+                        AppLazyListItem(
+                            title = "Nenhuma tarefa concluída",
+                            subtitle = "",
+                            isCompleted = false,
+                            isFavorite = false
+                        )
+                    }
+                } else {
+                    completedTasks.forEach { task ->
+                        item {
+                            HorizontalDivider()
+                            AppLazyListItem(
+                                title = task.title,
+                                subtitle = task.description,
+                                isCompleted = task.isCompleted,
+                                isFavorite = task.isFavorite
+                            )
+                        }
+                    }
                 }
             }
         }

@@ -22,9 +22,11 @@ fun AppLazyListItem(
     modifier: Modifier = Modifier,
     title: String,
     subtitle: String,
+    isCompleted: Boolean,
+    isFavorite: Boolean
 ) {
-    var isCheckboxChecked by remember { mutableStateOf(false) }
-    var isFavoriteChecked by remember { mutableStateOf(false) }
+    var isCheckboxChecked by remember { mutableStateOf(isCompleted) }
+    var isFavoriteChecked by remember { mutableStateOf(isFavorite) }
 
     ListItem(
         modifier = modifier.clickable(
@@ -64,6 +66,8 @@ fun AppLazyListItem(
 fun AppLazyListItemPreview() {
     AppLazyListItem(
         title = "Task 1",
-        subtitle = "Description of task 1"
+        subtitle = "Description of task 1",
+        isCompleted = false,
+        isFavorite = false
     )
 }

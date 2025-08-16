@@ -14,7 +14,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeScreenViewModel @Inject constructor(taskRepository: TaskRepository) : ViewModel() {
     val completedTask: StateFlow<List<TaskEntity>> = taskRepository.getCompletedTasks()
-        .map { tasks -> tasks.sortedByDescending { it.timestamp } }
+        .map { tasks -> tasks.map { TaskEntity(it.id, it.title, it.description, it.isFavorite) } }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
