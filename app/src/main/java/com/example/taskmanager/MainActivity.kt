@@ -23,7 +23,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.taskmanager.navigation.AppNavigation
 import com.example.taskmanager.ui.theme.TaskManagerTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,5 +35,21 @@ class MainActivity : ComponentActivity() {
                 AppNavigation()
             }
         }
+    }
+}
+
+@Preview(
+    showSystemUi = true,
+    showBackground = true,
+    name = "Main Activity Preview"
+
+)
+@Composable
+fun MainActivityPreview(){
+    TaskManagerTheme(
+        darkTheme = true,
+        dynamicColor = true
+    ) {
+        AppNavigation()
     }
 }

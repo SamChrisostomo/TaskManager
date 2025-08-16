@@ -4,13 +4,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.twotone.Star
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
-import androidx.compose.material3.Snackbar
-import androidx.compose.material3.SnackbarData
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -18,8 +15,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
 fun AppLazyListItem(
@@ -29,13 +25,14 @@ fun AppLazyListItem(
 ) {
     var isCheckboxChecked by remember { mutableStateOf(false) }
     var isFavoriteChecked by remember { mutableStateOf(false) }
-    var openDialog by remember { mutableStateOf(false) }
 
     ListItem(
         modifier = modifier.clickable(
             enabled = true,
             onClickLabel = title,
-            onClick = { openDialog = !openDialog }),
+            onClick = {
+
+            }),
         headlineContent = { Text(title) },
         supportingContent = { Text(subtitle) },
         leadingContent = {
@@ -60,9 +57,13 @@ fun AppLazyListItem(
             }
         }
     )
-    if (openDialog) {
-        Snackbar(){
-            Text(text = "This is a snackbar!")
-        }
-    }
+}
+
+@Preview
+@Composable
+fun AppLazyListItemPreview() {
+    AppLazyListItem(
+        title = "Task 1",
+        subtitle = "Description of task 1"
+    )
 }

@@ -18,12 +18,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.taskmanager.data.entity.TaskEntity
 import com.example.taskmanager.ui.components.AppLazyListItem
 import com.example.taskmanager.ui.components.AppMainScaffold
 
 @Composable
 fun HomeScreen(
-    navController: NavController
+    navController: NavController,
+    completedTasks: List<TaskEntity>
 ) {
     val taskListState: LazyListState = rememberLazyListState()
 
@@ -50,7 +52,7 @@ fun HomeScreen(
                     .weight(1f),
                 state = taskListState,
             ) {
-                items(20) {
+                items(completedTasks.size) {
                     HorizontalDivider()
                     AppLazyListItem(
                         title = "Task $it",
@@ -65,5 +67,5 @@ fun HomeScreen(
 @Preview(showSystemUi = true, showBackground = true)
 @Composable
 fun HomeScreenPreview() {
-    HomeScreen(navController = NavController(LocalContext.current))
+    HomeScreen(navController = NavController(LocalContext.current), completedTasks = emptyList())
 }
