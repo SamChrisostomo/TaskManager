@@ -10,10 +10,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 
@@ -23,34 +19,27 @@ fun AppLazyListItem(
     title: String,
     subtitle: String,
     isCompleted: Boolean,
-    isFavorite: Boolean
+    isFavorite: Boolean,
+    onCompletedChange: (Boolean) -> Unit,
+    onFavoriteToggle: () -> Unit,
+    onItemClick: () -> Unit
 ) {
-    var isCheckboxChecked by remember { mutableStateOf(isCompleted) }
-    var isFavoriteChecked by remember { mutableStateOf(isFavorite) }
-
     ListItem(
         modifier = modifier.clickable(
-            enabled = true,
-            onClickLabel = title,
-            onClick = {
-
-            }),
+            onClick = onItemClick
+        ),
         headlineContent = { Text(title) },
         supportingContent = { Text(subtitle) },
         leadingContent = {
             Checkbox(
-                checked = isCheckboxChecked,
-                onCheckedChange = { isChecked ->
-                    isCheckboxChecked = isChecked
-                }
+                checked = isCompleted,
+                onCheckedChange = onCompletedChange
             )
         },
         trailingContent = {
-            IconButton(onClick = {
-                isFavoriteChecked = !isFavoriteChecked
-            }) {
+            IconButton(onClick = onFavoriteToggle) {
                 Icon(
-                    imageVector = when (isFavoriteChecked) {
+                    imageVector = when (isFavorite) {
                         false -> Icons.TwoTone.Star
                         else -> Icons.Filled.Star
                     },
@@ -58,16 +47,5 @@ fun AppLazyListItem(
                 )
             }
         }
-    )
-}
-
-@Preview
-@Composable
-fun AppLazyListItemPreview() {
-    AppLazyListItem(
-        title = "Task 1",
-        subtitle = "Description of task 1",
-        isCompleted = false,
-        isFavorite = false
     )
 }

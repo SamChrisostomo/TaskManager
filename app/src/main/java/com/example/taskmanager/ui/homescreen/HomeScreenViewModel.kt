@@ -9,15 +9,34 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeScreenViewModel @Inject constructor(taskRepository: TaskRepository) : ViewModel() {
-    val completedTask: StateFlow<List<TaskEntity>> = taskRepository.getCompletedTasks()
-        .map { tasks -> tasks.map { TaskEntity(it.id, it.title, it.description, it.isFavorite) } }
+class HomeScreenViewModel @Inject constructor(private val taskRepository: TaskRepository) :
+    ViewModel() {
+    val uiState: StateFlow<HomeScreenUiState> = taskRepository.getCompletedTasks()
+        .map { tasks -> HomeScreenUiState(tasks = tasks) }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = emptyList<TaskEntity>()
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = HomeScreenUiState()
         )
+
+    fun onTaskCompletitionChanged(task: TaskEntity, isCompleted: Boolean) {
+        viewModelScope.launch {
+            taskRepository.updateTask(task.copy(isCompleted = isCompleted))
+        }
+    }
+
+    fun onTaskFavoriteToggled(task: TaskEntity) {
+        viewModelScope.launch {
+            taskRepository.updateTask(task.copy(isFavorite = !task.isFavorite))
+        }
+    }
 }
+
+data class HomeScreenUiState(
+    val tasks: List<TaskEntity> = emptyList(),
+//    val isLoading: Boolean = false
+)
