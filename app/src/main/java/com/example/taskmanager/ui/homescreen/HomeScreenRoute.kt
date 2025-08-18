@@ -17,6 +17,7 @@ fun HomeScreenRoute(
         navController = navController,
         uiState,
         onCompletedChange = viewModel::onTaskCompletitionChanged,
-        onFavoriteToggle = viewModel::onTaskFavoriteToggled
+        onFavoriteToggle = viewModel::onTaskFavoriteToggled,
+        onSelectTab = viewModel::onSelectTab
     )
 }

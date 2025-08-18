@@ -2,36 +2,50 @@ package com.example.taskmanager.ui.homescreen
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.PrimaryTabRow
+import androidx.compose.material3.Tab
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.taskmanager.data.entity.TaskEntity
-import com.example.taskmanager.ui.components.AllTaskCompleted
-import com.example.taskmanager.ui.components.AppLazyListItem
 import com.example.taskmanager.ui.components.AppMainScaffold
+import com.example.taskmanager.ui.components.TaskList
 
+enum class NavigationTab(
+    val title: String,
+    val icon: ImageVector
+) {
+    FAVORITE("Favorite", Icons.Filled.Favorite),
+    UNCOMPLETED("Uncompleted", Icons.Filled.PlayArrow),
+    COMPLETED("Completed", Icons.Filled.CheckCircle)
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     navController: NavController,
     uiState: HomeScreenUiState,
     onCompletedChange: (TaskEntity, Boolean) -> Unit,
-    onFavoriteToggle: (TaskEntity) -> Unit
+    onFavoriteToggle: (TaskEntity) -> Unit,
+    onSelectTab: (Int) -> Unit
 ) {
-    val taskListState: LazyListState = rememberLazyListState()
 
     AppMainScaffold(
         title = "Tarefas",
@@ -48,40 +62,54 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(16.dp)
         ) {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                state = taskListState,
-            ) {
-                if (uiState.tasks.isEmpty()) {
-                    item {
-                        AllTaskCompleted(
-                            modifier = Modifier.fillMaxSize()
-                        )
-                    }
-                } else {
-                    items(
-                        items = uiState.tasks,
-                        key = { task -> task.id }
-                    ) { task ->
-                        HorizontalDivider()
-                        AppLazyListItem(
-                            title = task.title,
-                            subtitle = task.description,
-                            isCompleted = task.isCompleted,
-                            isFavorite = task.isFavorite,
-                            onCompletedChange = { isCompleted ->
-                                onCompletedChange(task, isCompleted)
-                            },
-                            onFavoriteToggle = {
-                                onFavoriteToggle(task)
-                            },
-                            onItemClick = {}
-                        )
-                    }
+            var selectedTab = uiState.tabIndexSelected
+            var pagerState =
+                rememberPagerState(
+                    initialPage = selectedTab,
+                    pageCount = { NavigationTab.entries.size })
+
+            LaunchedEffect(selectedTab) {
+                pagerState.animateScrollToPage(selectedTab)
+            }
+
+            LaunchedEffect(pagerState.currentPage, pagerState.isScrollInProgress) {
+                if (!pagerState.isScrollInProgress) {
+                    onSelectTab(pagerState.currentPage)
+                }
+            }
+
+            PrimaryTabRow(selectedTabIndex = selectedTab, modifier = Modifier) {
+                NavigationTab.entries.forEachIndexed { index, destination ->
+                    Tab(
+                        selected = selectedTab == index,
+                        onClick = {
+                            onSelectTab(index)
+                        },
+                        text = {
+                            Text(
+                                text = destination.title,
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        },
+                        icon = {
+                            Icon(
+                                imageVector = destination.icon,
+                                contentDescription = null
+                            )
+                        }
+                    )
+                }
+            }
+
+            HorizontalPager(
+                state = pagerState
+            ) { pageIndex ->
+                when (pageIndex) {
+                    0 -> TaskList(uiState.favoriteTasks, onCompletedChange, onFavoriteToggle)
+                    1 -> TaskList(uiState.uncompletedTasks, onCompletedChange, onFavoriteToggle)
+                    2 -> TaskList(uiState.completedTasks, onCompletedChange, onFavoriteToggle)
                 }
             }
         }
@@ -95,6 +123,7 @@ fun HomeScreenPreview() {
         navController = NavController(LocalContext.current),
         uiState = HomeScreenUiState(),
         onCompletedChange = { _, _ -> },
-        onFavoriteToggle = {}
+        onFavoriteToggle = {},
+        onSelectTab = {}
     )
 }
