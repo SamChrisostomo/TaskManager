@@ -12,12 +12,19 @@ fun HomeScreenRoute(
     viewModel: HomeScreenViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val newTask by viewModel.taskStateFlow.collectAsState()
 
     HomeScreen(
         navController = navController,
         uiState,
-        onCompletedChange = viewModel::onTaskCompletitionChanged,
+        newTask = newTask,
+        onCompletedChange = viewModel::onTaskCompletionChanged,
         onFavoriteToggle = viewModel::onTaskFavoriteToggled,
-        onSelectTab = viewModel::onSelectTab
+        onSelectTab = viewModel::onSelectTab,
+        onShowBottomSheet = viewModel::onShowBottomSheet,
+        onTaskTitleChanged = viewModel::onTaskTitleChanged,
+        onTaskDescriptionChanged = viewModel::onTaskDescriptionChanged,
+        onTaskFavoriteChanged = viewModel::onTaskFavoriteChanged,
+        addNewTask = viewModel::addNewTask
     )
 }

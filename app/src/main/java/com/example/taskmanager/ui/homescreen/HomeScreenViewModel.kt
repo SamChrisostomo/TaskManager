@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -18,23 +19,26 @@ class HomeScreenViewModel @Inject constructor
     (
     private val taskRepository: TaskRepository
 ) : ViewModel() {
-
+    val taskStateFlow = MutableStateFlow(NewTask())
     private val _completedTasks = taskRepository.getCompletedTasks()
     private val _uncompletedTasks = taskRepository.getUncompletedTasks()
     private val _favoriteTasks = taskRepository.getFavoriteTasks()
-    private var _tabIndexSelected = MutableStateFlow<Int>(0)
+    private var _tabIndexSelected = MutableStateFlow(0)
+    private var _showBottomSheet = MutableStateFlow(false)
 
     val uiState: StateFlow<HomeScreenUiState> = combine(
         _uncompletedTasks,
         _favoriteTasks,
         _completedTasks,
-        _tabIndexSelected
-    ) { uncompleted, completed, favorite, tabSelected ->
+        _tabIndexSelected,
+        _showBottomSheet
+    ) { uncompleted, favorite, completed, tabSelected, showBottomSheet ->
         HomeScreenUiState(
-            completedTasks = completed,
             uncompletedTasks = uncompleted,
             favoriteTasks = favorite,
-            tabIndexSelected = tabSelected
+            completedTasks = completed,
+            tabIndexSelected = tabSelected,
+            showBottomSheet = showBottomSheet,
         )
     }.stateIn(
         scope = viewModelScope,
@@ -42,7 +46,7 @@ class HomeScreenViewModel @Inject constructor
         initialValue = HomeScreenUiState()
     )
 
-    fun onTaskCompletitionChanged(task: TaskEntity, isCompleted: Boolean) {
+    fun onTaskCompletionChanged(task: TaskEntity, isCompleted: Boolean) {
         viewModelScope.launch {
             taskRepository.updateTask(task.copy(isCompleted = isCompleted))
         }
@@ -54,8 +58,42 @@ class HomeScreenViewModel @Inject constructor
         }
     }
 
-    fun onSelectTab(index: Int){
+    fun onSelectTab(index: Int) {
         _tabIndexSelected.value = index
+    }
+
+    fun onShowBottomSheet(show: Boolean) {
+        _showBottomSheet.value = show
+    }
+
+    fun onTaskTitleChanged(title: String) {
+        taskStateFlow.update { currentValue ->
+            currentValue.copy(title = title)
+        }
+    }
+
+    fun onTaskDescriptionChanged(description: String) {
+        taskStateFlow.update { currentValue ->
+            currentValue.copy(description = description)
+        }
+    }
+
+    fun onTaskFavoriteChanged(isFavorite: Boolean) {
+        taskStateFlow.update { currentValue ->
+            currentValue.copy(isFavorite = isFavorite)
+        }
+    }
+
+    fun addNewTask() {
+        viewModelScope.launch {
+            taskRepository.insertTask(
+                TaskEntity(
+                    title = taskStateFlow.value.title,
+                    description = taskStateFlow.value.description,
+                    isFavorite = taskStateFlow.value.isFavorite
+                )
+            )
+        }
     }
 }
 
@@ -63,6 +101,12 @@ data class HomeScreenUiState(
     val completedTasks: List<TaskEntity> = emptyList(),
     val uncompletedTasks: List<TaskEntity> = emptyList(),
     val favoriteTasks: List<TaskEntity> = emptyList(),
-    val tabIndexSelected: Int = 0
-//    val isLoading: Boolean = false
+    val tabIndexSelected: Int = 0,
+    val showBottomSheet: Boolean = false,
+)
+
+data class NewTask(
+    val title: String = "",
+    val description: String = "",
+    val isFavorite: Boolean = false,
 )

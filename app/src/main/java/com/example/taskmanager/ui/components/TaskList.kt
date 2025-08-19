@@ -21,7 +21,7 @@ fun TaskList(
     val taskListState: LazyListState = rememberLazyListState()
 
     LazyColumn(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth(),
         state = taskListState,
     ) {

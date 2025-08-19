@@ -2,4 +2,5 @@
     <string name="app_name">Task Manager</string>
     <string name="task_complete_text">All tasks completed</string>
     <string name="congrats_text">Nice work!</string>
+    <string name="modal_save_btn">Salvar</string>
 </resources>
