@@ -8,12 +8,11 @@ plugins {
 
 android {
     namespace = "com.example.taskmanager"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.taskmanager"
         minSdk = 24
-        this.targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
